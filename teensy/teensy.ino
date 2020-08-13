@@ -18,10 +18,10 @@ unsigned int oldValues[] = {
                             {1, 2, 3},
                             };
 
-oldValues[mode][param];
+//oldValues[mode][param];
 
-if(values[0] != oldValues[values[3][0]){
-}
+//if(values[0] != oldValues[values[3][0]){
+//}
 
 int iterator = 0;
 
