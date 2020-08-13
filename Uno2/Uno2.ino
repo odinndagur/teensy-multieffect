@@ -34,7 +34,10 @@ const char endOfTransmissionDelimiter   = '>';
 const char nextSensorDelimiter = 'n';
 
 unsigned int values[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-//0 MODE, 1 ROTARY1, 2 ROTARY2, 3 ROTARY3, 4 joyX, 5 joyY, 6 DIST, 7 takki
+unsigned int tempArray[8];
+//0 ROTARY1, 1 ROTARY2, 2 ROTARY3, 3 MODE, 4 joyX, 5 joyY, 6 DIST, 7 takki
+
+int iterator = 0;
 
 //DISTANCE SENSOR variables
 const int trigPin = 11;
@@ -49,9 +52,6 @@ int mode = 0;
 
 //pinnar fyrir alla takka
 int takkiPin = 13;
-int buttonR1 = 2;
-int buttonR2 = 5;
-int buttonR3 = 8;
 //
 
 //pinnar fyrir joystick
@@ -62,9 +62,6 @@ int joyStickYPin = A3;
 
 //takkar instantiate
 Bounce takki = Bounce();
-Bounce r1button = Bounce();
-Bounce r2button = Bounce();
-Bounce r3button = Bounce();
 //
 
 void setup () {
@@ -75,14 +72,6 @@ void setup () {
   lcd.clear();
   lcd.backlight();
 
-  // Set encoder pins as inputs
-  for (int i = 0; i < 3; i++) {
-    pinMode(CLK[i], INPUT);
-    pinMode(DT[i], INPUT);
-    lastStateCLK[i] = digitalRead(CLK[i]);
-  }
-  //
-
   //DISTANCE SENSOR PINS
   pinMode(trigPin, OUTPUT); //distance sensor
   pinMode(echoPin, INPUT); //distance sensor
@@ -91,27 +80,22 @@ void setup () {
   //takkar
   takki.attach(takkiPin, INPUT_PULLUP); // Attach the debouncer to a pin with INPUT_PULLUP mode
   takki.interval(25); // Use a debounce interval of 25 milliseconds
-
-  r1button.attach(buttonR1, INPUT_PULLUP); // Attach the debouncer to a pin with INPUT_PULLUP mode
-  r1button.interval(25); // Use a debounce interval of 25 milliseconds
-
-  r2button.attach(buttonR2, INPUT_PULLUP); // Attach the debouncer to a pin with INPUT_PULLUP mode
-  r2button.interval(25); // Use a debounce interval of 25 milliseconds
-
-  r3button.attach(buttonR3, INPUT_PULLUP); // Attach the debouncer to a pin with INPUT_PULLUP mode
-  r3button.interval(25); // Use a debounce interval of 25 milliseconds
   //
 
 
 } // end of setup
 
 void loop () {
+  while (Serial.available ()){
+    processInput ();
+  }
+
+  
   readButtons(); //read takki, rotary buttons
   if (values[7]) { //ef takki er on
     values[6] = pollDistanceSensor(); //updeita distance sensor í
   }
   readJoysticks();
-  readEncoders();
 
 
   //  Serial.print("mode = ");
@@ -139,7 +123,7 @@ void loop () {
   //  Serial.println(values[7]);
 
 //  if (needToUpdate == true) {
-//    lcdPrint();
+    lcdPrint();
 //    Serial.println("lcd");
 //  }
   if (millis() - lastTransmit >= transmitTimer) {
@@ -150,63 +134,37 @@ void loop () {
 
 
 void lcdPrint() {
-  lcd.clear();
+//  lcd.clear();
+//
+//  lcd.setCursor(0, 0);
+//  lcd.print("Distance: ");
+//  lcd.print(values[6]);
+//  lcd.print(" cm");
+//
+//  lcd.setCursor(0, 1);
+//  lcd.print("Mode: ");
+//  lcd.print(values[0]);
+
+
+lcd.clear();
 
   lcd.setCursor(0, 0);
-  lcd.print("Distance: ");
-  lcd.print(values[6]);
-  lcd.print(" cm");
-
-  lcd.setCursor(0, 1);
-  lcd.print("Mode: ");
+  lcd.print("nett: ");
   lcd.print(values[0]);
 
+  lcd.setCursor(0, 1);
+  lcd.print("1: ");
+  lcd.print(values[1]);
+
+  lcd.setCursor(0,2);
+  lcd.print("2: ");
+  lcd.print(values[2]);
+
+  lcd.setCursor(0,3);
+  lcd.print("Mode: ");
+  lcd.print(values[3]);
   needToUpdate = false;
 }
-
-
-
-void readEncoders() {
-  for (int i = 0; i < 3; i++) {
-    // Read the current state of CLK
-    currentStateCLK[i] = digitalRead(CLK[i]);
-
-    // If last and current state of CLK are different, then pulse occurred
-    // React to only 1 state change to avoid double count
-    if (currentStateCLK[i] != lastStateCLK[i]  && currentStateCLK[i] == 1) {
-
-      // If the DT state is different than the CLK state then
-      // the encoder is rotating CCW so decrement
-      if (digitalRead(DT[i]) != currentStateCLK[i]) {
-        values[i + 1] ++;
-        Serial.print("rotary ");
-        Serial.println(i + 1);
-        Serial.println(values[i + 1]);
-        needToUpdate = true;
-        //        currentDir = "CCW";
-      } else {
-        // Encoder is rotating CW so increment
-        values[i + 1] --;
-        Serial.print("rotary ");
-        Serial.println(i + 1);
-        Serial.println(values[i + 1]);
-        needToUpdate = true;
-
-        //        currentDir = "CW";
-      }
-
-      //      Serial.print("Direction: ");
-      //      Serial.print(currentDir);
-      //      Serial.print(" | Counter: ");
-      //      Serial.println(values[i+1]);
-    }
-
-    // Remember last CLK state
-    lastStateCLK[i] = currentStateCLK[i];
-  }
-
-}
-
 
 
 void readJoysticks() {
@@ -216,45 +174,10 @@ void readJoysticks() {
 
 void readButtons() {
   takki.update();
-  r1button.update();
-  r2button.update();
-  r3button.update();
-
-  if (r1button.fell()) {
-    if (values[0] != 0) { //values[0] == mode
-      values[0] = 0;
-      Serial.print("Mode = ");
-      Serial.println(mode);
-      needToUpdate = true;
-
-    }
-  }
-
-  if (r2button.fell()) {
-    if (values[0] != 1) {
-      values[0] = 1;
-      Serial.print("Mode = ");
-      Serial.println(mode);
-      needToUpdate = true;
-
-    }
-  }
-
-  if (r3button.fell()) {
-    if (values[0] != 2) {
-      values[0] = 2;
-      Serial.print("Mode = ");
-      Serial.println(mode);
-      needToUpdate = true;
-
-    }
-  }
-
   if ( takki.changed() ) {
     int debouncedValue = takki.read();
     values[7] = debouncedValue;
     needToUpdate = true;
-
   }
 }
 
@@ -272,19 +195,75 @@ int pollDistanceSensor() {
   return distCm;
 }
 
+//
+//
+//FOR SENDING INFO TO TEENSY
 
 void sendValues() {
   //  Serial.println ("Start of transmission");
 
-  mySerial.print (startOfTransmissionDelimiter);
+  Serial.print (startOfTransmissionDelimiter);
 
   for (int i = 0; i < 8; i++) {
-    mySerial.print(values[i]);
-    mySerial.print(nextSensorDelimiter);
+    Serial.print(values[i]);
+    Serial.print(nextSensorDelimiter);
   }
   //    mySerial.print (la);    // send the number
-  mySerial.print(endOfTransmissionDelimiter);
-  mySerial.println ();
+  Serial.print(endOfTransmissionDelimiter);
+  Serial.println ();
 
   //  Serial.println("End of transmission");
 }
+
+
+//
+//
+//FOR RECEIVING DATA FROM PRO MICRO
+
+void processNumber (const long n) {
+  tempArray[iterator++] = n;
+  //Serial.println (n);
+}  // end of processNumber
+
+void processArrays(){
+  for(int i = 0; i < 4; i++){
+    if(values[i] != tempArray[i]){
+      values[i] = tempArray[i];
+    }
+  }
+  
+  for(int i = 0; i < 8; i++){
+//    Serial.print("Array at spot: ");
+//    Serial.print(i);
+//    Serial.print(" is: ");
+//    Serial.println(values[i]);
+  }
+}
+
+void processInput () {
+  static long receivedNumber = 0;
+  byte c = Serial.read ();
+
+  switch (c) {
+
+    case endOfTransmissionDelimiter:
+//      Serial.println("end of transmission");
+      iterator = 0;
+      processArrays();
+      break;
+    
+    case nextSensorDelimiter:
+      processNumber (receivedNumber);
+
+    // fall through to start a new number
+    case startOfTransmissionDelimiter:
+      receivedNumber = 0;
+      break;
+
+    case '0' ... '9':
+      receivedNumber *= 10;
+      receivedNumber += c - '0';
+      break;
+
+  } // end of switch
+}  // end of processInput

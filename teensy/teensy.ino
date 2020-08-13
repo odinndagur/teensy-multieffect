@@ -5,11 +5,6 @@
 //#include <SoftwareSerial.h>
 //SoftwareSerial mySerial(4, 5); //RX, TX, These pins will be used to send the data to another Arduino
 
-//LCD SCREEN
-#include <Wire.h> //for i2c
-#include <LiquidCrystal_I2C.h> //lcd library
-LiquidCrystal_I2C lcd(0x3F, 20, 4);  //MUNA AÐ TENGJA SDA Í A4 OG SCL Í A5
-
 
 const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
@@ -24,14 +19,11 @@ unsigned long lastPrint = 0;
 int interVal = 50;
 
 void setup () {
-  
-  lcd.init();
-  lcd.clear();
-  lcd.backlight();
 
   processArrays();
   
   Serial.begin(9600);
+  Serial1.begin(9600);
   //Serial.println ("Starting ...");
 } // end of setup
 
@@ -57,7 +49,7 @@ void processArrays(){
 
 void processInput () {
   static long receivedNumber = 0;
-  byte c = Serial.read ();
+  byte c = Serial1.read ();
 
   switch (c) {
 
@@ -85,35 +77,40 @@ void processInput () {
 
 void loop () {
 
-  while (Serial.available ()){
+  while (Serial1.available ()){
     processInput ();
   }
   if(millis() - lastPrint > interVal){
-  lcdPrint();
-  lastPrint = millis();
+printTheStuff();
+lastPrint = millis();
   }
 
   // do other stuff here
 } // end of loop
 
+void printTheStuff(){
+Serial.print("0: ");
+Serial.println(values[0]);
 
-void lcdPrint() {
-  lcd.clear();
+Serial.print("1: ");
+Serial.println(values[1]);
 
-  lcd.setCursor(0, 0);
-  lcd.print("0: ");
-  lcd.print(values[0]);
+Serial.print("2: ");
+Serial.println(values[2]);
 
-  lcd.setCursor(0, 1);
-  lcd.print("1: ");
-  lcd.print(values[1]);
+Serial.print("3: ");
+Serial.println(values[3]);
 
-  lcd.setCursor(0,2);
-  lcd.print("2: ");
-  lcd.print(values[2]);
+Serial.print("4: ");
+Serial.println(values[4]);
 
-  lcd.setCursor(0,3);
-  lcd.print("Mode: ");
-  lcd.print(values[3]);
+Serial.print("5: ");
+Serial.println(values[5]);
+
+Serial.print("6: ");
+Serial.println(values[6]);
+
+Serial.print("7: ");
+Serial.println(values[7]);
 
 }
