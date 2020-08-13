@@ -21,8 +21,9 @@ unsigned int oldValues[] = {
 
 //oldValues[mode][param];
 
-//if(values[0] != oldValues[values[mode][0]){
+//if(values[0] != oldValues[values[3][0]){
 //pottur 0 á mode breyttist
+//gera eitthvað ákveðið
 //}
 
 int iterator = 0;
