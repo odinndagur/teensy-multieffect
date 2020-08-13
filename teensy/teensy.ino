@@ -22,7 +22,7 @@ unsigned int oldValues[] = {
 //oldValues[mode][param];
 
 //if(values[0] != oldValues[values[mode][0]){
-pottur 0 á mode breyttist
+//pottur 0 á mode breyttist
 //}
 
 int iterator = 0;
