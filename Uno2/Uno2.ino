@@ -11,7 +11,7 @@ LiquidCrystal_I2C lcd(0x3F, 20, 4);  //MUNA AÐ TENGJA SDA Í A4 OG SCL Í A5
 //
 
 //
-int lcdTimer = 100; //how often to update LCD
+int lcdTimer = 80; //how often to update LCD
 int lastPrint = 0;
 bool needToUpdate = true;
 //
@@ -39,7 +39,7 @@ const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
 const char nextSensorDelimiter = 'n';
 
-unsigned int values[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+unsigned int values[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned int tempArray[8];
 //0 ROTARY1, 1 ROTARY2, 2 ROTARY3, 3 MODE, 4 joyX, 5 joyY, 6 DIST, 7 takki
 
@@ -103,69 +103,44 @@ void loop () {
   }
   readJoysticks();
 
-
-  //  Serial.print("mode = ");
-  //  Serial.println(values[0]);
-
-  //  Serial.print("r1 = ");
-  //  Serial.println(values[1]);
-  //
-  //  Serial.print("r2 = ");
-  //  Serial.println(values[2]);
-  //
-  //  Serial.print("r3 = ");
-  //  Serial.println(values[3]);
-  //
-  //  Serial.print("joyx = ");
-  //  Serial.println(values[4]);
-  //
-  //  Serial.print("joyy = ");
-  //  Serial.println(values[5]);
-  //
-  //  Serial.print("dist = ");
-  //  Serial.println(values[6]);
-  //
-  //  Serial.print("takki = ");
-  //  Serial.println(values[7]);
-
-//    if (needToUpdate == true) {
-//  lcdPrint();
-  //    Serial.println("lcd");
-//    }
+  //    if (millis() - lastPrint >= lcdTimer) {
+  if (needToUpdate == true) {
+    lcdPrint();
+    needToUpdate = false;
+    //    Serial.println("lcd");
+  }
   if (millis() - lastTransmit >= transmitTimer) {
     sendValues();
-      lcdPrint();
     lastTransmit = millis();
   }
 }  // end of loop
 
 
 void lcdPrint() {
-//
-//  const char* effectName[3] = {"Chorus", "Delay", "Reverb",}; // const char* array for loop names on sd card
-//  const char* param0[3] = {"Voices", "Time", "RSize",}; // const char* array for loop names on sd card
-//  const char* param1[3] = {"", "Feedbk", "Damping",}; // const char* array for loop names on sd card
-//  const char* param2[3] = {"Wet", "Wet", "Wet",}; // const char* array for loop names on sd card
-//setCursor(x,y);
+  //
+  //  const char* effectName[3] = {"Chorus", "Delay", "Reverb",}; // const char* array for loop names on sd card
+  //  const char* param0[3] = {"Voices", "Time", "RSize",}; // const char* array for loop names on sd card
+  //  const char* param1[3] = {"", "Feedbk", "Damping",}; // const char* array for loop names on sd card
+  //  const char* param2[3] = {"Wet", "Wet", "Wet",}; // const char* array for loop names on sd card
+  //setCursor(x,y);
 
-lcd.clear();
-//int mode = values[3];
-//lcd.setCursor(0,6);
-//lcd.print(effectName[mode]);
+  lcd.clear();
+  lcd.setCursor(12, 0);
+  lcd.print(effectName[mode]);
 
-lcd.setCursor(0,1);
-lcd.print(param0[mode]);
-lcd.setCursor(0,2);
-lcd.print(param1[mode]);
-lcd.setCursor(0,3);
-lcd.print(param2[mode]);
+  lcd.setCursor(0, 1);
+  lcd.print(param0[mode]);
+  lcd.setCursor(0, 2);
+  lcd.print(param1[mode]);
+  lcd.setCursor(0, 3);
+  lcd.print(param2[mode]);
 
-lcd.setCursor(15,1);
-lcd.print(values[0]); //param0
-lcd.setCursor(15,2);
-lcd.print(values[1]); //param1
-lcd.setCursor(15,3);
-lcd.print(values[2]); //param2
+  lcd.setCursor(15, 1);
+  lcd.print(values[0]); //param0
+  lcd.setCursor(15, 2);
+  lcd.print(values[1]); //param1
+  lcd.setCursor(15, 3);
+  lcd.print(values[2]); //param2
 
 
 }
@@ -181,7 +156,7 @@ void readButtons() {
   if ( takki.changed() ) {
     int debouncedValue = takki.read();
     values[7] = debouncedValue;
-    needToUpdate = true;
+    //    needToUpdate = true;
   }
 }
 
@@ -233,6 +208,7 @@ void processArrays() {
   for (int i = 0; i < 4; i++) {
     if (values[i] != tempArray[i]) {
       values[i] = tempArray[i];
+      needToUpdate = true;
     }
     mode = values[3];
   }
