@@ -10,8 +10,18 @@ const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
 const char nextSensorDelimiter = 'n';
 
-unsigned int tempArray[8] = {0,0,0,0,0,0,0,0};
-unsigned int values[8] = {1,2,3,4,5,6,7,8};
+unsigned int tempArray[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+unsigned int values[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+unsigned int oldValues[] = {
+                            {1, 2, 3},
+                            {1, 2, 3},
+                            {1, 2, 3},
+                            };
+
+oldValues[mode][param];
+
+if(values[0] != oldValues[values[3][0]){
+}
 
 int iterator = 0;
 
@@ -21,7 +31,7 @@ int interVal = 50;
 void setup () {
 
   processArrays();
-  
+
   Serial.begin(9600);
   Serial1.begin(9600);
   //Serial.println ("Starting ...");
@@ -32,18 +42,18 @@ void processNumber (const long n) {
   //Serial.println (n);
 }  // end of processNumber
 
-void processArrays(){
-  for(int i = 0; i < 8; i++){
-    if(values[i] != tempArray[i]){
+void processArrays() {
+  for (int i = 0; i < 8; i++) {
+    if (values[i] != tempArray[i]) {
       values[i] = tempArray[i];
     }
   }
-  
-  for(int i = 0; i < 8; i++){
-//    Serial.print("Array at spot: ");
-//    Serial.print(i);
-//    Serial.print(" is: ");
-//    Serial.println(values[i]);
+
+  for (int i = 0; i < 8; i++) {
+    //    Serial.print("Array at spot: ");
+    //    Serial.print(i);
+    //    Serial.print(" is: ");
+    //    Serial.println(values[i]);
   }
 }
 
@@ -54,11 +64,11 @@ void processInput () {
   switch (c) {
 
     case endOfTransmissionDelimiter:
-//      Serial.println("end of transmission");
+      //      Serial.println("end of transmission");
       iterator = 0;
       processArrays();
       break;
-    
+
     case nextSensorDelimiter:
       processNumber (receivedNumber);
 
@@ -77,40 +87,40 @@ void processInput () {
 
 void loop () {
 
-  while (Serial1.available ()){
+  while (Serial1.available ()) {
     processInput ();
   }
-  if(millis() - lastPrint > interVal){
-printTheStuff();
-lastPrint = millis();
+  if (millis() - lastPrint > interVal) {
+    printTheStuff();
+    lastPrint = millis();
   }
 
   // do other stuff here
 } // end of loop
 
-void printTheStuff(){
-Serial.print("0: ");
-Serial.println(values[0]);
+void printTheStuff() {
+  Serial.print("0: ");
+  Serial.println(values[0]);
 
-Serial.print("1: ");
-Serial.println(values[1]);
+  Serial.print("1: ");
+  Serial.println(values[1]);
 
-Serial.print("2: ");
-Serial.println(values[2]);
+  Serial.print("2: ");
+  Serial.println(values[2]);
 
-Serial.print("3: ");
-Serial.println(values[3]);
+  Serial.print("3: ");
+  Serial.println(values[3]);
 
-Serial.print("4: ");
-Serial.println(values[4]);
+  Serial.print("4: ");
+  Serial.println(values[4]);
 
-Serial.print("5: ");
-Serial.println(values[5]);
+  Serial.print("5: ");
+  Serial.println(values[5]);
 
-Serial.print("6: ");
-Serial.println(values[6]);
+  Serial.print("6: ");
+  Serial.println(values[6]);
 
-Serial.print("7: ");
-Serial.println(values[7]);
+  Serial.print("7: ");
+  Serial.println(values[7]);
 
 }
