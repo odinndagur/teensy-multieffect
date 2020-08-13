@@ -4,7 +4,7 @@ Bounce button1 = Bounce();
 Bounce button2 = Bounce();
 
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(14, 15); //RX, TX, These pins will be used to send the data to another Arduino
+SoftwareSerial mySerial(14, 9); //RX, TX, These pins will be used to send the data to another Arduino
 
 const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
@@ -17,9 +17,13 @@ unsigned int values[4] = {0, 1, 2, 17};
 int mode = 0;
 
 
-long oldPot0[3] = { -999, -999, -999};
-long oldPot1[3] = { -999, -999, -999};
-long oldPot2[3] = { -999, -999, -999};
+//long oldPot0[3] = { -999, -999, -999};
+//long oldPot1[3] = { -999, -999, -999};
+//long oldPot2[3] = { -999, -999, -999};
+
+long oldPot0[3] = {0, 0, 0};
+long oldPot1[3] = {0, 0, 0};
+long oldPot2[3] = {0, 0, 0};
 
 #include <Encoder.h>
 
@@ -27,19 +31,19 @@ long oldPot2[3] = { -999, -999, -999};
 //   Best Performance: both pins have interrupt capability
 //   Good Performance: only the first pin has interrupt capability
 //   Low Performance:  neither pin has interrupt capability
-Encoder myEnc0(0, 1);
-Encoder myEnc1(5, 2);
+Encoder myEnc0(2, 7);
+Encoder myEnc1(0, 1);
 Encoder myEnc2(3, 4);
 //   avoid using pins with LEDs attached
 
 void setup () {
 
   Serial.begin(9600);
-  button0.attach(6, INPUT_PULLUP);
+  button0.attach(5, INPUT_PULLUP);
   button0.interval(5);
-
-  button1.attach(7, INPUT_PULLUP);
-  button1.interval(5);
+  
+    button1.attach(6, INPUT_PULLUP);
+    button1.interval(5);
 
   button2.attach(8, INPUT_PULLUP);
   button2.interval(5);
