@@ -12,6 +12,7 @@ const char nextSensorDelimiter = 'n';
 
 unsigned int tempArray[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned int values[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+//0 ROTARY1, 1 ROTARY2, 2 ROTARY3, 3 MODE, 4 joyX, 5 joyY, 6 DIST, 7 dist on/off
 unsigned int oldValues[] = {
                             {1, 2, 3},
                             {1, 2, 3},
@@ -20,7 +21,8 @@ unsigned int oldValues[] = {
 
 //oldValues[mode][param];
 
-//if(values[0] != oldValues[values[3][0]){
+//if(values[0] != oldValues[values[mode][0]){
+pottur 0 á mode breyttist
 //}
 
 int iterator = 0;
