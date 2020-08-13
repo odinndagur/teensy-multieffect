@@ -10,7 +10,7 @@ const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
 const char nextSensorDelimiter = 'n';
 
-unsigned int values[4] = {0, 1, 2, 17};
+unsigned int values[4] = {0, 0, 0, 0};
 //0 ROTARY1, 1 ROTARY2, 2 ROTARY3, 3 MODE
 
 //mode stilling
@@ -31,9 +31,14 @@ long oldPot2[3] = {0, 0, 0};
 //   Best Performance: both pins have interrupt capability
 //   Good Performance: only the first pin has interrupt capability
 //   Low Performance:  neither pin has interrupt capability
-Encoder myEnc0(2, 7);
-Encoder myEnc1(0, 1);
-Encoder myEnc2(3, 4);
+Encoder myEnc0(0,1);
+Encoder myEnc1(2,7);
+Encoder myEnc2(3,4);
+
+//
+//Encoder myEnc0(2, 7);
+//Encoder myEnc1(0, 1);
+//Encoder myEnc2(3, 4);
 //   avoid using pins with LEDs attached
 
 void setup () {

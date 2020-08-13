@@ -29,6 +29,12 @@ int currentStateCLK[3];
 int lastStateCLK[3];
 //
 
+const char* effectName[3] = {"Chorus", "Delay", "Reverb",}; // const char* array for loop names on sd card
+const char* param0[3] = {"Voices", "DTime", "RoomSize",}; // const char* array for loop names on sd card
+const char* param1[3] = {"", "Feedback", "Damping",}; // const char* array for loop names on sd card
+const char* param2[3] = {"DRY/WET", "DRY/WET", "DRY/WET",}; // const char* array for loop names on sd card
+
+
 const char startOfTransmissionDelimiter = '<';
 const char endOfTransmissionDelimiter   = '>';
 const char nextSensorDelimiter = 'n';
@@ -86,11 +92,11 @@ void setup () {
 } // end of setup
 
 void loop () {
-  while (Serial.available ()){
+  while (Serial.available ()) {
     processInput ();
   }
 
-  
+
   readButtons(); //read takki, rotary buttons
   if (values[7]) { //ef takki er on
     values[6] = pollDistanceSensor(); //updeita distance sensor í
@@ -122,48 +128,46 @@ void loop () {
   //  Serial.print("takki = ");
   //  Serial.println(values[7]);
 
-//  if (needToUpdate == true) {
-    lcdPrint();
-//    Serial.println("lcd");
-//  }
+//    if (needToUpdate == true) {
+//  lcdPrint();
+  //    Serial.println("lcd");
+//    }
   if (millis() - lastTransmit >= transmitTimer) {
     sendValues();
+      lcdPrint();
     lastTransmit = millis();
   }
 }  // end of loop
 
 
 void lcdPrint() {
-//  lcd.clear();
 //
-//  lcd.setCursor(0, 0);
-//  lcd.print("Distance: ");
-//  lcd.print(values[6]);
-//  lcd.print(" cm");
-//
-//  lcd.setCursor(0, 1);
-//  lcd.print("Mode: ");
-//  lcd.print(values[0]);
-
+//  const char* effectName[3] = {"Chorus", "Delay", "Reverb",}; // const char* array for loop names on sd card
+//  const char* param0[3] = {"Voices", "Time", "RSize",}; // const char* array for loop names on sd card
+//  const char* param1[3] = {"", "Feedbk", "Damping",}; // const char* array for loop names on sd card
+//  const char* param2[3] = {"Wet", "Wet", "Wet",}; // const char* array for loop names on sd card
+//setCursor(x,y);
 
 lcd.clear();
+//int mode = values[3];
+//lcd.setCursor(0,6);
+//lcd.print(effectName[mode]);
 
-  lcd.setCursor(0, 0);
-  lcd.print("nett: ");
-  lcd.print(values[0]);
+lcd.setCursor(0,1);
+lcd.print(param0[mode]);
+lcd.setCursor(0,2);
+lcd.print(param1[mode]);
+lcd.setCursor(0,3);
+lcd.print(param2[mode]);
 
-  lcd.setCursor(0, 1);
-  lcd.print("1: ");
-  lcd.print(values[1]);
+lcd.setCursor(15,1);
+lcd.print(values[0]); //param0
+lcd.setCursor(15,2);
+lcd.print(values[1]); //param1
+lcd.setCursor(15,3);
+lcd.print(values[2]); //param2
 
-  lcd.setCursor(0,2);
-  lcd.print("2: ");
-  lcd.print(values[2]);
 
-  lcd.setCursor(0,3);
-  lcd.print("Mode: ");
-  lcd.print(values[3]);
-  needToUpdate = false;
 }
 
 
@@ -225,18 +229,19 @@ void processNumber (const long n) {
   //Serial.println (n);
 }  // end of processNumber
 
-void processArrays(){
-  for(int i = 0; i < 4; i++){
-    if(values[i] != tempArray[i]){
+void processArrays() {
+  for (int i = 0; i < 4; i++) {
+    if (values[i] != tempArray[i]) {
       values[i] = tempArray[i];
     }
+    mode = values[3];
   }
-  
-  for(int i = 0; i < 8; i++){
-//    Serial.print("Array at spot: ");
-//    Serial.print(i);
-//    Serial.print(" is: ");
-//    Serial.println(values[i]);
+
+  for (int i = 0; i < 8; i++) {
+    //    Serial.print("Array at spot: ");
+    //    Serial.print(i);
+    //    Serial.print(" is: ");
+    //    Serial.println(values[i]);
   }
 }
 
@@ -247,11 +252,11 @@ void processInput () {
   switch (c) {
 
     case endOfTransmissionDelimiter:
-//      Serial.println("end of transmission");
+      //      Serial.println("end of transmission");
       iterator = 0;
       processArrays();
       break;
-    
+
     case nextSensorDelimiter:
       processNumber (receivedNumber);
 
